@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
-class UMaterialInstanceDynamic;
+#define MAX_DISTANCE 256
 
 UCLASS()
 class LEARNING2_API ATile : public AActor
@@ -24,9 +24,11 @@ public:
 	void SetSelected();
 
 	// for dijsktras
-	uint32_t Distance = 256;
+	uint32_t Distance = MAX_DISTANCE;
 	bool Visited = false;
-	
+	ATile* Parent;
+	bool Selectable = false;
+
 	UPROPERTY(VisibleAnywhere)
 		UStaticMeshComponent* VisualMesh;
 
@@ -35,9 +37,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		int MovementPenalty = 1;
-private:
-	bool Selectable = false;
 
+private:
 	UMaterial* DefaultMaterial;
 	UMaterial* HighlightMaterial;
 	UMaterial* SelectableMaterial;

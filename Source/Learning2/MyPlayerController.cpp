@@ -6,7 +6,6 @@
 #include "Tile.h"
 #include "Unit.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
-#include <queue>
 using namespace std;
 
 AMyPlayerController::AMyPlayerController()
@@ -14,14 +13,6 @@ AMyPlayerController::AMyPlayerController()
 	bShowMouseCursor = true;
 	bEnableClickEvents = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
-
-	// Get all tiles in the level
-	TArray<AActor*> tiles;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATile::StaticClass(), tiles);
-	for (AActor* tile : tiles)
-	{
-		Tiles.push_back(Cast<ATile>(tile));
-	}
 }
 
 void AMyPlayerController::BeginPlay()
@@ -29,6 +20,7 @@ void AMyPlayerController::BeginPlay()
 	// Setup the default camera
 	Super::BeginPlay();
 	Director = Cast<ACameraDirector>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraDirector::StaticClass()));
+	Player = Cast<APlayerPawn>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawn::StaticClass()));
 }
 
 void AMyPlayerController::SetupInputComponent()
@@ -53,6 +45,7 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &AMyPlayerController::ZoomOut);
 }
 
+// Camera Functions
 void AMyPlayerController::MoveForward()
 {
 	Director->SetMovingForward();
@@ -90,6 +83,7 @@ void AMyPlayerController::ZoomOut()
 	Director->Zoom(false);
 }
 
+// General Functions
 void AMyPlayerController::SelectActor()
 {
 	FVector Start, Dir, End;
@@ -100,48 +94,8 @@ void AMyPlayerController::SelectActor()
 	if (HitResult.Actor.IsValid())
 	{
 		AActor* HitActor = HitResult.Actor.Get();
-		if (HitActor->GetClass() == AUnit::StaticClass())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("ITS a Unit"));
-			AUnit* HitUnit = Cast<AUnit>(HitActor);
-			ShowUnitMovementRange(HitUnit);
-		}
-		
+		Player->SelectActor(HitActor);
 	}
 }
 
-// just a helper that finds the largest distance stored in each Tile
-bool largestDistance(ATile* tile1, ATile* tile2)
-{
-	return tile1->Distance > tile2->Distance;
-}
-// uses Dijkistras algo to find all tiles in movement range of Unit
-// and set them as selectable
-void AMyPlayerController::ShowUnitMovementRange(AUnit* Unit)
-{
-	Unit->GetCurrentTile()->Distance = 0;
-	
-	ATile* currentTile;
-	while (!Tiles.empty())
-	{
-		sort(Tiles.begin(), Tiles.end(), largestDistance);
-		currentTile = Tiles.back();
-		Tiles.pop_back();
-		if (currentTile->Distance <= Unit->GetMovement())
-		{
-			currentTile->SetSelected();
-			currentTile->Visited = true;
-			for (int i = 0; i < 4; i++)
-			{
-				ATile* neighbor = currentTile->GetAdjList()[i];
-				if (neighbor != nullptr && !neighbor->Visited)
-				{
-					uint32_t tmpDistance = currentTile->Distance + neighbor->MovementPenalty;
-					if (neighbor->Distance > tmpDistance)
-						neighbor->Distance = tmpDistance;
-				}
-			}
-		}
-	}
-}
 

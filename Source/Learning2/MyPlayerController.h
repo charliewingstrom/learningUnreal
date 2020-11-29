@@ -3,6 +3,7 @@
 #pragma once
 #include "Unit.h"
 #include "CameraDirector.h"
+#include "PlayerPawn.h"
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "MyPlayerController.generated.h"
@@ -36,8 +37,7 @@ private:
 	void ZoomOut();
 
 	void SelectActor();
-	void ShowUnitMovementRange(AUnit* unit);
 
-	std::vector<ATile*> Tiles;
 	ACameraDirector* Director;
+	APlayerPawn* Player;
 };

@@ -75,9 +75,6 @@ void ATile::FindAdjList()
 	}
 }
 
-
-
-
 std::vector<ATile*> ATile::GetAdjList()
 {
 	return AdjList;
@@ -109,7 +106,7 @@ void ATile::Highlight(bool On)
 void ATile::Reset()
 {
 	VisualMesh->SetMaterial(0, DefaultMaterial);
-	
+	Distance = MAX_DISTANCE;
 }
 
 // Called every frame
