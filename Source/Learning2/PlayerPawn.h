@@ -37,12 +37,14 @@ private:
 	FVector UnitHeading;
 	void CalculateHeading();
 	void FollowHeading();
-
+	void FinishMoving();
 	void ShowUnitMovementRange(AUnit* unit);
 	ATile* CurrentTileFocus;
 	AUnit* CurrentUnit;
+	
+	void ResetTiles();
 	std::vector<ATile*> Tiles;
-	std::vector<ATile*> SelectableTiles;
 	std::vector<ATile*> Path;
 
+	bool bPlayerTurn = true;
 };

@@ -58,6 +58,11 @@ void AUnit::FindCurrentTile()
 	}
 }
 
+void AUnit::SetPreviousTile()
+{
+	PreviousTile = CurrentTile;
+}
+
 // Called every frame
 void AUnit::Tick(float DeltaTime)
 {

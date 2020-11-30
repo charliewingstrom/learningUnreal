@@ -76,6 +76,8 @@ void APlayerPawn::SelectActor(AActor* selectedActor)
 void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (!bPlayerTurn)
+		return;
 	if (bUnitMoving)
 	{
 		FollowHeading();
@@ -105,7 +107,7 @@ void APlayerPawn::CalculateHeading()
 		UnitHeading[2] = 0.0f;
 	}
 	else
-		bUnitMoving = false;
+		FinishMoving();
 }
 
 void APlayerPawn::FollowHeading()
@@ -116,6 +118,16 @@ void APlayerPawn::FollowHeading()
 		Path.pop_back();
 		CalculateHeading();
 	}
+}
+void APlayerPawn::FinishMoving()
+{
+	bUnitMoving = false;
+	CurrentUnit->SetPreviousTile();
+	CurrentUnit->FindCurrentTile();
+	ResetTiles();
+
+	// Remove this later...
+	CurrentUnit = nullptr;
 }
 // just a helper that finds the largest distance stored in each Tile
 bool largestDistance(ATile* tile1, ATile* tile2)
@@ -128,15 +140,15 @@ void APlayerPawn::ShowUnitMovementRange(AUnit* Unit)
 {
 	Unit->GetCurrentTile()->Distance = 0;
 	ATile* currentTile;
-	while (!Tiles.empty())
+	std::vector<ATile*> tiles = Tiles;
+	while (!tiles.empty())
 	{
-		sort(Tiles.begin(), Tiles.end(), largestDistance);
-		currentTile = Tiles.back();
-		Tiles.pop_back();
+		sort(tiles.begin(), tiles.end(), largestDistance);
+		currentTile = tiles.back();
+		tiles.pop_back();
 		if (currentTile->Distance <= Unit->GetMovement())
 		{
 			currentTile->SetSelected();
-			SelectableTiles.push_back(currentTile);
 			currentTile->Visited = true;
 			for (int i = 0; i < 4; i++)
 			{
@@ -152,6 +164,14 @@ void APlayerPawn::ShowUnitMovementRange(AUnit* Unit)
 				}
 			}
 		}
+	}
+}
+
+void APlayerPawn::ResetTiles()
+{
+	for (ATile* tile : Tiles)
+	{
+		tile->Reset();
 	}
 }
 

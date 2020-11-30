@@ -107,6 +107,9 @@ void ATile::Reset()
 {
 	VisualMesh->SetMaterial(0, DefaultMaterial);
 	Distance = MAX_DISTANCE;
+	Visited = false;
+	Parent = nullptr;
+	Selectable = false;
 }
 
 // Called every frame

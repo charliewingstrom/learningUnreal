@@ -22,6 +22,7 @@ public:
 	
 	void Highlight(bool On);
 	void SetSelected();
+	void Reset();
 
 	// for dijsktras
 	uint32_t Distance = MAX_DISTANCE;
@@ -31,9 +32,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 		UStaticMeshComponent* VisualMesh;
-
-	UPROPERTY(EditAnywhere)
-		UMaterialInstanceDynamic* Material;
 
 	UPROPERTY(EditAnywhere)
 		int MovementPenalty = 1;
@@ -46,7 +44,7 @@ private:
 	std::vector<ATile*> AdjList;
 	
 	void FindAdjList();
-	void Reset();
+	
 
 protected:
 	// Called when the game starts or when spawned
