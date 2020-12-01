@@ -16,6 +16,7 @@ APlayerPawn::APlayerPawn()
 	for (AActor* tile : tiles)
 		Tiles.push_back(Cast<ATile>(tile));
 	
+	Director = Cast<ACameraDirector>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraDirector::StaticClass()));
 }
 
 // Called when the game starts or when spawned
@@ -67,8 +68,9 @@ void APlayerPawn::SelectActor(AActor* selectedActor)
 	if (selectedActor->GetClass() == AUnit::StaticClass())
 	{
 		AUnit* HitUnit = Cast<AUnit>(selectedActor);
-		ShowUnitMovementRange(HitUnit);
+		ShowPlayerUnitMovementRange(HitUnit);
 		CurrentUnit = HitUnit;
+		Director->SetActorLocation(CurrentUnit->GetActorLocation());
 	}
 }
 
@@ -97,7 +99,6 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-
 void APlayerPawn::CalculateHeading()
 {
 	if (!Path.empty())
@@ -109,10 +110,10 @@ void APlayerPawn::CalculateHeading()
 	else
 		FinishMoving();
 }
-
 void APlayerPawn::FollowHeading()
 {
 	CurrentUnit->SetActorLocation(CurrentUnit->GetActorLocation() + UnitHeading);
+	Director->SetActorLocation(CurrentUnit->GetActorLocation());
 	if (CurrentUnit->GetActorLocation()[0] == Path.back()->GetActorLocation()[0] && CurrentUnit->GetActorLocation()[1] == Path.back()->GetActorLocation()[1])
 	{
 		Path.pop_back();
@@ -136,7 +137,7 @@ bool largestDistance(ATile* tile1, ATile* tile2)
 }
 // uses Dijkistras algo to find all tiles in movement range of Unit
 // and set them as selectable
-void APlayerPawn::ShowUnitMovementRange(AUnit* Unit)
+void APlayerPawn::ShowPlayerUnitMovementRange(AUnit* Unit)
 {
 	Unit->GetCurrentTile()->Distance = 0;
 	ATile* currentTile;
@@ -170,9 +171,8 @@ void APlayerPawn::ShowUnitMovementRange(AUnit* Unit)
 void APlayerPawn::ResetTiles()
 {
 	for (ATile* tile : Tiles)
-	{
 		tile->Reset();
-	}
+	
 }
 
 

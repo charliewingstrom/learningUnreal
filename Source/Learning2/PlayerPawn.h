@@ -3,6 +3,7 @@
 #pragma once
 #include "Unit.h"
 #include "Tile.h"
+#include "CameraDirector.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
@@ -38,7 +39,7 @@ private:
 	void CalculateHeading();
 	void FollowHeading();
 	void FinishMoving();
-	void ShowUnitMovementRange(AUnit* unit);
+	void ShowPlayerUnitMovementRange(AUnit* unit);
 	ATile* CurrentTileFocus;
 	AUnit* CurrentUnit;
 	
@@ -47,4 +48,5 @@ private:
 	std::vector<ATile*> Path;
 
 	bool bPlayerTurn = true;
+	ACameraDirector* Director;
 };
