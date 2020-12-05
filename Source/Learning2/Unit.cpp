@@ -16,9 +16,9 @@ AUnit::AUnit()
 	{
 		VisualMesh->SetStaticMesh(UnitAsset.Object);
 		VisualMesh->SetRelativeLocation(FVector(0.0f));
-		static ConstructorHelpers::FObjectFinder<UMaterial> UnitMaterial(TEXT("/Game/CustomMaterials/GenericPlayerUnitMaterial.GenericPlayerUnitMaterial"));
+		/*static ConstructorHelpers::FObjectFinder<UMaterial> UnitMaterial(TEXT("/Game/CustomMaterials/GenericPlayerUnitMaterial.GenericPlayerUnitMaterial"));
 		Material = UnitMaterial.Object;
-		VisualMesh->SetMaterial(0, Material);
+		VisualMesh->SetMaterial(0, Material);*/
 	}
 }
 
@@ -27,11 +27,26 @@ void AUnit::BeginPlay()
 {
 	Super::BeginPlay();
 	FindCurrentTile();
-	CurrentTile->SetSelected();
+}
+
+
+void AUnit::SetPreviousTile()
+{
+	PreviousTile = CurrentTile;
+}
+
+// Called every frame
+void AUnit::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
 }
 
 void AUnit::FindCurrentTile()
 {
+	if (CurrentTile != nullptr)
+		CurrentTile->PlayerOccupied = false;
+
 	FVector currentLocation = GetActorLocation();
 	FVector below = FVector(0.0f, 0.0f, -50.0f);
 	FCollisionQueryParams lineParams;
@@ -47,27 +62,16 @@ void AUnit::FindCurrentTile()
 			ECollisionChannel::ECC_WorldDynamic,
 			lineParams
 		)
-	)
+		)
 	{
 		AActor* hitActor = hitResult.GetActor();
 		if (hitActor != nullptr)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s current tile is set to %s"), *this->GetName(), *hitActor->GetName());
 			CurrentTile = Cast<ATile>(hitActor);
+			CurrentTile->PlayerOccupied = true;
 		}
 	}
-}
-
-void AUnit::SetPreviousTile()
-{
-	PreviousTile = CurrentTile;
-}
-
-// Called every frame
-void AUnit::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 ATile* AUnit::GetCurrentTile()

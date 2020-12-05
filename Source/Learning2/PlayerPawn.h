@@ -1,8 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "Unit.h"
 #include "Tile.h"
+#include "PlayerUnit.h"
+#include "EnemyUnit.h"
 #include "CameraDirector.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
@@ -39,7 +40,7 @@ private:
 	void CalculateHeading();
 	void FollowHeading();
 	void FinishMoving();
-	void ShowPlayerUnitMovementRange(AUnit* unit);
+	void ShowPlayerUnitMovementRange(APlayerUnit* unit);
 	ATile* CurrentTileFocus;
 	AUnit* CurrentUnit;
 	
@@ -48,5 +49,9 @@ private:
 	std::vector<ATile*> Path;
 
 	bool bPlayerTurn = true;
+	void EndPlayerTurn();
 	ACameraDirector* Director;
+
+	std::vector<APlayerUnit*> PlayerUnits;
+	std::vector<AEnemyUnit*> EnemyUnits;
 };

@@ -2,8 +2,6 @@
 
 
 #include "PlayerPawn.h"
-#include "Tile.h"
-#include "Unit.h"
 #include "DrawDebugHelpers.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 // Sets default values
@@ -17,13 +15,23 @@ APlayerPawn::APlayerPawn()
 		Tiles.push_back(Cast<ATile>(tile));
 	
 	Director = Cast<ACameraDirector>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraDirector::StaticClass()));
+
+	TArray<AActor*> playerUnits;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerUnit::StaticClass(), playerUnits);
+	for (AActor* player : playerUnits)
+		PlayerUnits.push_back(Cast<APlayerUnit>(player));
+	TArray<AActor*> enemyUnits;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyUnit::StaticClass(), enemyUnits);
+	for (AActor* enemy : enemyUnits)
+		EnemyUnits.push_back(Cast<AEnemyUnit>(enemy));
 }
 
 // Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	bPlayerTurn = true;
+	UE_LOG(LogTemp, Warning, TEXT("%d"), PlayerUnits.size());
 }
 
 void APlayerPawn::TraceForTile(const FVector& Start, const FVector& End)
@@ -65,21 +73,79 @@ void APlayerPawn::SelectActor(AActor* selectedActor)
 			bUnitMoving = true;
 		}
 	}
-	if (selectedActor->GetClass() == AUnit::StaticClass())
+	if (selectedActor->GetClass() == APlayerUnit::StaticClass())
 	{
-		AUnit* HitUnit = Cast<AUnit>(selectedActor);
+		APlayerUnit* HitUnit = Cast<APlayerUnit>(selectedActor);
 		ShowPlayerUnitMovementRange(HitUnit);
 		CurrentUnit = HitUnit;
 		Director->SetActorLocation(CurrentUnit->GetActorLocation());
 	}
 }
-
+// just a helper that finds the largest distance stored in each Tile
+bool largestDistance(ATile* tile1, ATile* tile2)
+{
+	return tile1->Distance > tile2->Distance;
+}
 // Called every frame
 void APlayerPawn::Tick(float DeltaTime)
 {
+	
 	Super::Tick(DeltaTime);
-	if (!bPlayerTurn)
-		return;
+	if (!bPlayerTurn && !bUnitMoving)
+	{
+
+		// for each enemy unit, find the path to the closest player unit
+		// move as far as possible on that path
+		if (!EnemyUnits.empty())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("An Enemy is still left"));
+			CurrentUnit = EnemyUnits.back();
+			EnemyUnits.pop_back();
+
+			// get path to nearest Player Unit
+			CurrentUnit->GetCurrentTile()->Distance = 0;
+			CurrentUnit->GetCurrentTile()->PlayerOccupied = false;
+			ATile* currentTile = nullptr;
+			std::vector<ATile*> tiles = Tiles;
+			while (!tiles.empty())
+			{
+				sort(tiles.begin(), tiles.end(), largestDistance);
+				currentTile = tiles.back();
+				tiles.pop_back();
+				if (currentTile->PlayerOccupied)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Broke"));
+					break;
+				}
+				currentTile->Visited = true;
+				for (ATile* neighbor : currentTile->GetAdjList())
+				{
+					if (neighbor != nullptr && !neighbor->Visited)
+					{
+						uint32_t tmpDistance = currentTile->Distance + neighbor->MovementPenalty;
+						if (neighbor->Distance > tmpDistance)
+						{
+							neighbor->Distance = tmpDistance;
+							neighbor->Parent = currentTile;
+						}
+					}
+				}
+			}
+			while (currentTile != nullptr)
+			{
+				Path.push_back(currentTile);
+				currentTile = currentTile->Parent;
+			}
+			UE_LOG(LogTemp, Warning, TEXT("Path Length : %d"), Path.size());
+			CalculateHeading();
+			bUnitMoving = true;
+		}
+		else
+		{
+			bPlayerTurn = true;
+		}
+	}
+		
 	if (bUnitMoving)
 	{
 		FollowHeading();
@@ -101,10 +167,12 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 }
 void APlayerPawn::CalculateHeading()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Heading Calculated"));
 	if (!Path.empty())
 	{
 		ATile* currentTile = Path.back();
 		UnitHeading = (currentTile->GetActorLocation() - CurrentUnit->GetActorLocation()) / UnitMovingVelocity;
+		UE_LOG(LogTemp, Warning, TEXT("Heading : %g, %g"), UnitHeading[0], UnitHeading[1]);
 		UnitHeading[2] = 0.0f;
 	}
 	else
@@ -112,6 +180,7 @@ void APlayerPawn::CalculateHeading()
 }
 void APlayerPawn::FollowHeading()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Follow Heading Called"));
 	CurrentUnit->SetActorLocation(CurrentUnit->GetActorLocation() + UnitHeading);
 	Director->SetActorLocation(CurrentUnit->GetActorLocation());
 	if (CurrentUnit->GetActorLocation()[0] == Path.back()->GetActorLocation()[0] && CurrentUnit->GetActorLocation()[1] == Path.back()->GetActorLocation()[1])
@@ -128,16 +197,21 @@ void APlayerPawn::FinishMoving()
 	ResetTiles();
 
 	// Remove this later...
+	CurrentUnit->Active = false;
 	CurrentUnit = nullptr;
+	int ActiveUnits = 0;
+	for (APlayerUnit* unit : PlayerUnits)
+	{
+		if (unit->Active)
+			ActiveUnits++;
+	}
+	if (ActiveUnits == 0)
+		EndPlayerTurn();
 }
-// just a helper that finds the largest distance stored in each Tile
-bool largestDistance(ATile* tile1, ATile* tile2)
-{
-	return tile1->Distance > tile2->Distance;
-}
+
 // uses Dijkistras algo to find all tiles in movement range of Unit
 // and set them as selectable
-void APlayerPawn::ShowPlayerUnitMovementRange(AUnit* Unit)
+void APlayerPawn::ShowPlayerUnitMovementRange(APlayerUnit* Unit)
 {
 	Unit->GetCurrentTile()->Distance = 0;
 	ATile* currentTile;
@@ -173,6 +247,16 @@ void APlayerPawn::ResetTiles()
 	for (ATile* tile : Tiles)
 		tile->Reset();
 	
+}
+
+void APlayerPawn::EndPlayerTurn()
+{
+	UE_LOG(LogTemp, Warning, TEXT("End Player TUrn Called"));
+	bPlayerTurn = false;
+	for (AUnit* unit : PlayerUnits)
+	{
+		unit->Active = true;
+	}
 }
 
 

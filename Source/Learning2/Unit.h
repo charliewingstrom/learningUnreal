@@ -15,8 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	AUnit();
 
-	void FindCurrentTile();
-	void SetPreviousTile();
+	
 	UPROPERTY(EditAnywhere)
 		UStaticMeshComponent* VisualMesh;
 
@@ -30,12 +29,19 @@ protected:
 
 private:
 	uint32_t Movement = 5;
+
+protected:
 	ATile* CurrentTile;
 	ATile* PreviousTile;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void FindCurrentTile();
 	ATile* GetCurrentTile();
+	void SetPreviousTile();
+
 	uint32_t GetMovement();
+
+	bool Active = true;
 };

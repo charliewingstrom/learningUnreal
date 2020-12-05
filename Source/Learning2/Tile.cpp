@@ -2,6 +2,7 @@
 
 
 #include "Tile.h"
+#include "Unit.h"
 #include "DrawDebugHelpers.h"
 #include "Materials/MaterialInstanceDynamic.h"
 FVector vectorArray[]{ FVector(150.0f, 0.0f, 0.0f), FVector(0.0f, 150.0f, 0.0f), FVector(0.0f, -150.0f, 0.0f), FVector(-150.0f, 0.0f, 0.0f) };
@@ -111,6 +112,7 @@ void ATile::Reset()
 	Parent = nullptr;
 	Selectable = false;
 }
+
 
 // Called every frame
 void ATile::Tick(float DeltaTime)

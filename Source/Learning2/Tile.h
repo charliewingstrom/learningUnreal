@@ -17,17 +17,19 @@ public:
 	// Sets default values for this actor's properties
 	ATile();
 	
-
 	std::vector<ATile*> GetAdjList();
 	
 	void Highlight(bool On);
 	void SetSelected();
 	void Reset();
 
+	bool PlayerOccupied = false;
+	bool EnemyOccupied = false;
+
 	// for dijsktras
+	ATile* Parent;
 	uint32_t Distance = MAX_DISTANCE;
 	bool Visited = false;
-	ATile* Parent;
 	bool Selectable = false;
 
 	UPROPERTY(VisibleAnywhere)
@@ -36,13 +38,14 @@ public:
 	UPROPERTY(EditAnywhere)
 		int MovementPenalty = 1;
 
+	
 private:
 	UMaterial* DefaultMaterial;
 	UMaterial* HighlightMaterial;
 	UMaterial* SelectableMaterial;
 	
 	std::vector<ATile*> AdjList;
-	
+
 	void FindAdjList();
 	
 
