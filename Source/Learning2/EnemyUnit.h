@@ -16,5 +16,5 @@ class LEARNING2_API AEnemyUnit : public AUnit
 
 public:
 	AEnemyUnit();
-	void FindCurrentTile();
+	void FindCurrentTile() override;
 };

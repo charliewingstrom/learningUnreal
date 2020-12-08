@@ -50,6 +50,7 @@ private:
 
 	bool bPlayerTurn = true;
 	void EndPlayerTurn();
+	void EndEnemyTurn();
 	ACameraDirector* Director;
 
 	std::vector<APlayerUnit*> PlayerUnits;

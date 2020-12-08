@@ -73,8 +73,9 @@ void APlayerPawn::SelectActor(AActor* selectedActor)
 			bUnitMoving = true;
 		}
 	}
-	if (selectedActor->GetClass() == APlayerUnit::StaticClass())
+	else if (selectedActor->GetClass() == APlayerUnit::StaticClass())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("I GOT HERE"));
 		APlayerUnit* HitUnit = Cast<APlayerUnit>(selectedActor);
 		ShowPlayerUnitMovementRange(HitUnit);
 		CurrentUnit = HitUnit;
@@ -104,7 +105,6 @@ void APlayerPawn::Tick(float DeltaTime)
 
 			// get path to nearest Player Unit
 			CurrentUnit->GetCurrentTile()->Distance = 0;
-			CurrentUnit->GetCurrentTile()->PlayerOccupied = false;
 			ATile* currentTile = nullptr;
 			std::vector<ATile*> tiles = Tiles;
 			while (!tiles.empty())
@@ -112,11 +112,7 @@ void APlayerPawn::Tick(float DeltaTime)
 				sort(tiles.begin(), tiles.end(), largestDistance);
 				currentTile = tiles.back();
 				tiles.pop_back();
-				if (currentTile->PlayerOccupied)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Broke"));
-					break;
-				}
+				
 				currentTile->Visited = true;
 				for (ATile* neighbor : currentTile->GetAdjList())
 				{
@@ -128,8 +124,12 @@ void APlayerPawn::Tick(float DeltaTime)
 							neighbor->Distance = tmpDistance;
 							neighbor->Parent = currentTile;
 						}
+						if (neighbor->PlayerOccupied)
+							break;
 					}
 				}
+				if (currentTile->PlayerOccupied)
+					break;
 			}
 			while (currentTile != nullptr)
 			{
@@ -142,7 +142,7 @@ void APlayerPawn::Tick(float DeltaTime)
 		}
 		else
 		{
-			bPlayerTurn = true;
+			EndEnemyTurn();
 		}
 	}
 		
@@ -167,12 +167,12 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 }
 void APlayerPawn::CalculateHeading()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Heading Calculated"));
-	if (!Path.empty())
+	//UE_LOG(LogTemp, Warning, TEXT("Heading Calculated"));
+	if (!Path.empty() && Path.back()->Distance <= CurrentUnit->GetMovement())
 	{
 		ATile* currentTile = Path.back();
 		UnitHeading = (currentTile->GetActorLocation() - CurrentUnit->GetActorLocation()) / UnitMovingVelocity;
-		UE_LOG(LogTemp, Warning, TEXT("Heading : %g, %g"), UnitHeading[0], UnitHeading[1]);
+		//UE_LOG(LogTemp, Warning, TEXT("Heading : %g, %g"), UnitHeading[0], UnitHeading[1]);
 		UnitHeading[2] = 0.0f;
 	}
 	else
@@ -180,7 +180,7 @@ void APlayerPawn::CalculateHeading()
 }
 void APlayerPawn::FollowHeading()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Follow Heading Called"));
+	//UE_LOG(LogTemp, Warning, TEXT("Follow Heading Called"));
 	CurrentUnit->SetActorLocation(CurrentUnit->GetActorLocation() + UnitHeading);
 	Director->SetActorLocation(CurrentUnit->GetActorLocation());
 	if (CurrentUnit->GetActorLocation()[0] == Path.back()->GetActorLocation()[0] && CurrentUnit->GetActorLocation()[1] == Path.back()->GetActorLocation()[1])
@@ -195,7 +195,7 @@ void APlayerPawn::FinishMoving()
 	CurrentUnit->SetPreviousTile();
 	CurrentUnit->FindCurrentTile();
 	ResetTiles();
-
+	Path = std::vector<ATile*>();
 	// Remove this later...
 	CurrentUnit->Active = false;
 	CurrentUnit = nullptr;
@@ -225,9 +225,8 @@ void APlayerPawn::ShowPlayerUnitMovementRange(APlayerUnit* Unit)
 		{
 			currentTile->SetSelected();
 			currentTile->Visited = true;
-			for (int i = 0; i < 4; i++)
+			for (ATile* neighbor : currentTile->GetAdjList())
 			{
-				ATile* neighbor = currentTile->GetAdjList()[i];
 				if (neighbor != nullptr && !neighbor->Visited)
 				{
 					uint32_t tmpDistance = currentTile->Distance + neighbor->MovementPenalty;
@@ -251,12 +250,21 @@ void APlayerPawn::ResetTiles()
 
 void APlayerPawn::EndPlayerTurn()
 {
-	UE_LOG(LogTemp, Warning, TEXT("End Player TUrn Called"));
+	UE_LOG(LogTemp, Warning, TEXT("End Player Turn Called"));
 	bPlayerTurn = false;
 	for (AUnit* unit : PlayerUnits)
 	{
 		unit->Active = true;
 	}
+}
+
+void APlayerPawn::EndEnemyTurn()
+{
+	bPlayerTurn = true;
+	TArray<AActor*> enemyUnits;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyUnit::StaticClass(), enemyUnits);
+	for (AActor* enemy : enemyUnits)
+		EnemyUnits.push_back(Cast<AEnemyUnit>(enemy));
 }
 
 
