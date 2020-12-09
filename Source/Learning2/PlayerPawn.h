@@ -5,6 +5,7 @@
 #include "PlayerUnit.h"
 #include "EnemyUnit.h"
 #include "CameraDirector.h"
+#include "MovementManager.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
@@ -17,7 +18,7 @@ class LEARNING2_API APlayerPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	APlayerPawn();
-
+	~APlayerPawn();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -32,21 +33,14 @@ public:
 
 	void TraceForTile(const FVector& Start, const FVector& End);
 	void SelectActor(AActor* selectedActor);
-	
+	void UnitWait();
 private:
 	bool bUnitMoving = false;
-	float UnitMovingVelocity = 40.0f;
-	FVector UnitHeading;
-	void CalculateHeading();
-	void FollowHeading();
-	void FinishMoving();
-	void ShowPlayerUnitMovementRange(APlayerUnit* unit);
+	MovementManager* MyMovementManager;
 	ATile* CurrentTileFocus;
 	AUnit* CurrentUnit;
-	
-	void ResetTiles();
+
 	std::vector<ATile*> Tiles;
-	std::vector<ATile*> Path;
 
 	bool bPlayerTurn = true;
 	void EndPlayerTurn();

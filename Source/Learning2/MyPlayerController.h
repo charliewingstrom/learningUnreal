@@ -25,7 +25,7 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
 private:
-	
+	// camera 
 	void MoveForward();
 	void MoveBack();
 	void MoveLeft();
@@ -36,7 +36,9 @@ private:
 	void ZoomIn();
 	void ZoomOut();
 
+	// general actions
 	void SelectActor();
+	void UnitWait();
 
 	ACameraDirector* Director;
 	APlayerPawn* Player;

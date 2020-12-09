@@ -27,7 +27,7 @@ void AMyPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SelectActor", IE_Pressed, this, &AMyPlayerController::SelectActor);
+	
 
 	InputComponent->BindAction("MoveForward", IE_Pressed, this, &AMyPlayerController::MoveForward);
 	InputComponent->BindAction("MoveForward", IE_Released, this, &AMyPlayerController::MoveForward);
@@ -43,6 +43,9 @@ void AMyPlayerController::SetupInputComponent()
 	InputComponent->BindAction("RotateCameraLeft", IE_Pressed, this, &AMyPlayerController::RotateCameraLeft);
 	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &AMyPlayerController::ZoomIn);
 	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &AMyPlayerController::ZoomOut);
+
+	InputComponent->BindAction("SelectActor", IE_Pressed, this, &AMyPlayerController::SelectActor);
+	InputComponent->BindAction("UnitWait", IE_Pressed, this, &AMyPlayerController::UnitWait);
 }
 
 // Camera Functions
@@ -96,6 +99,10 @@ void AMyPlayerController::SelectActor()
 		AActor* HitActor = HitResult.Actor.Get();
 		Player->SelectActor(HitActor);
 	}
+}
+void AMyPlayerController::UnitWait()
+{
+	Player->UnitWait();
 }
 
 
