@@ -4,8 +4,10 @@
 #include "Tile.h"
 #include "PlayerUnit.h"
 #include "EnemyUnit.h"
+
 #include "CameraDirector.h"
 #include "MovementManager.h"
+#include "ui/InGameHUD.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
@@ -37,16 +39,18 @@ public:
 private:
 	bool bUnitMoving = false;
 	MovementManager* MyMovementManager;
+	
+	bool bPlayerTurn = true;
+	void StartPlayerTurn();
+	void EndPlayerTurn();
+	void StartEnemyTurn();
+	void EndEnemyTurn();
+
+	ACameraDirector* Director;
+	AInGameHUD* HUD;
 	ATile* CurrentTileFocus;
 	AUnit* CurrentUnit;
-
-	std::vector<ATile*> Tiles;
-
-	bool bPlayerTurn = true;
-	void EndPlayerTurn();
-	void EndEnemyTurn();
-	ACameraDirector* Director;
-
 	std::vector<APlayerUnit*> PlayerUnits;
 	std::vector<AEnemyUnit*> EnemyUnits;
+	std::vector<ATile*> Tiles;
 };

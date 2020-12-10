@@ -35,8 +35,6 @@ private:
 	// Adds Tile to path in a loop until tile == nullptr
 	void AddToPathFromTile(ATile* tile);
 
-	
-
 	float UnitMovingVelocity = 40.0f;
 	FVector UnitHeading;
 	

@@ -43,5 +43,5 @@ public:
 
 	uint32_t GetMovement();
 
-	bool Active = true;
+	bool Active = false;
 };

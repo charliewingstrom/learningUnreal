@@ -16,9 +16,6 @@ AUnit::AUnit()
 	{
 		VisualMesh->SetStaticMesh(UnitAsset.Object);
 		VisualMesh->SetRelativeLocation(FVector(0.0f));
-		/*static ConstructorHelpers::FObjectFinder<UMaterial> UnitMaterial(TEXT("/Game/CustomMaterials/GenericPlayerUnitMaterial.GenericPlayerUnitMaterial"));
-		Material = UnitMaterial.Object;
-		VisualMesh->SetMaterial(0, Material);*/
 	}
 }
 

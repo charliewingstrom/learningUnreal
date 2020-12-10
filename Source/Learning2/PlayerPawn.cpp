@@ -14,18 +14,20 @@ APlayerPawn::APlayerPawn()
 	for (AActor* tile : tiles)
 		Tiles.push_back(Cast<ATile>(tile));
 	
-	Director = Cast<ACameraDirector>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraDirector::StaticClass()));
-
 	TArray<AActor*> playerUnits;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerUnit::StaticClass(), playerUnits);
 	for (AActor* player : playerUnits)
 		PlayerUnits.push_back(Cast<APlayerUnit>(player));
+
 	TArray<AActor*> enemyUnits;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyUnit::StaticClass(), enemyUnits);
 	for (AActor* enemy : enemyUnits)
 		EnemyUnits.push_back(Cast<AEnemyUnit>(enemy));
 
+	Director = Cast<ACameraDirector>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraDirector::StaticClass()));
 	MyMovementManager = new MovementManager(Tiles, Director);
+
+	HUD = Cast<AInGameHUD>(UGameplayStatics::GetActorOfClass(GetWorld(), AInGameHUD::StaticClass()));
 }
 
 APlayerPawn::~APlayerPawn()
@@ -94,7 +96,7 @@ void APlayerPawn::UnitWait()
 				ActiveUnits++;
 		}
 		if (ActiveUnits == 0)
-			EndPlayerTurn();
+			StartEnemyTurn();
 	}
 }
 // Called every frame
@@ -116,14 +118,13 @@ void APlayerPawn::Tick(float DeltaTime)
 		}
 		else
 		{
-			EndEnemyTurn();
+			StartPlayerTurn();
 		}
 	}
 		
 	if (MyMovementManager->bUnitMoving)
-	{
 		MyMovementManager->FollowHeading();
-	}
+	
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
 		FVector Start, Dir, End;
@@ -137,23 +138,35 @@ void APlayerPawn::Tick(float DeltaTime)
 void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
-void APlayerPawn::EndPlayerTurn()
+void APlayerPawn::StartPlayerTurn()
 {
-	bPlayerTurn = false;
+	bPlayerTurn = true;
+	HUD->ShowPlayerPhaseText();
+	HUD->ShowEnemyPhaseText();
 	for (AUnit* unit : PlayerUnits)
 		unit->Active = true;
 }
 
-void APlayerPawn::EndEnemyTurn()
+void APlayerPawn::EndPlayerTurn()
 {
-	bPlayerTurn = true;
+}
+
+void APlayerPawn::StartEnemyTurn()
+{
+	bPlayerTurn = false;
 	TArray<AActor*> enemyUnits;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyUnit::StaticClass(), enemyUnits);
 	for (AActor* enemy : enemyUnits)
 		EnemyUnits.push_back(Cast<AEnemyUnit>(enemy));
+
+	HUD->ShowPlayerPhaseText();
+	HUD->ShowEnemyPhaseText();
+}
+
+void APlayerPawn::EndEnemyTurn()
+{
 }
 
 
