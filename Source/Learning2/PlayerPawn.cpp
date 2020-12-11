@@ -19,10 +19,10 @@ APlayerPawn::APlayerPawn()
 	for (AActor* player : playerUnits)
 		PlayerUnits.push_back(Cast<APlayerUnit>(player));
 
-	TArray<AActor*> enemyUnits;
+	/*TArray<AActor*> enemyUnits;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyUnit::StaticClass(), enemyUnits);
 	for (AActor* enemy : enemyUnits)
-		EnemyUnits.push_back(Cast<AEnemyUnit>(enemy));
+		EnemyUnits.push_back(Cast<AEnemyUnit>(enemy));*/
 
 	Director = Cast<ACameraDirector>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraDirector::StaticClass()));
 	MyMovementManager = new MovementManager(Tiles, Director);
@@ -96,7 +96,11 @@ void APlayerPawn::UnitWait()
 				ActiveUnits++;
 		}
 		if (ActiveUnits == 0)
+		{
+			EndPlayerTurn();
 			StartEnemyTurn();
+		}
+			
 	}
 }
 // Called every frame
@@ -118,6 +122,7 @@ void APlayerPawn::Tick(float DeltaTime)
 		}
 		else
 		{
+			EndEnemyTurn();
 			StartPlayerTurn();
 		}
 	}
@@ -144,13 +149,13 @@ void APlayerPawn::StartPlayerTurn()
 {
 	bPlayerTurn = true;
 	HUD->ShowPlayerPhaseText();
-	HUD->ShowEnemyPhaseText();
 	for (AUnit* unit : PlayerUnits)
 		unit->Active = true;
 }
 
 void APlayerPawn::EndPlayerTurn()
 {
+	HUD->ShowPlayerPhaseText();
 }
 
 void APlayerPawn::StartEnemyTurn()
@@ -161,12 +166,12 @@ void APlayerPawn::StartEnemyTurn()
 	for (AActor* enemy : enemyUnits)
 		EnemyUnits.push_back(Cast<AEnemyUnit>(enemy));
 
-	HUD->ShowPlayerPhaseText();
 	HUD->ShowEnemyPhaseText();
 }
 
 void APlayerPawn::EndEnemyTurn()
 {
+	HUD->ShowEnemyPhaseText();
 }
 
 
