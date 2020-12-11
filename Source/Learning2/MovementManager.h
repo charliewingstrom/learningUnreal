@@ -40,6 +40,9 @@ private:
 	
 	
 	std::vector<ATile*> Tiles;
+	// any tile that has its distance or parent changed must go here
+	// to save from reseting every tile each time tiles must be reset
+	std::vector<ATile*> TouchedTiles;
 	std::vector<ATile*> Path;
 
 	ACameraDirector* Director;

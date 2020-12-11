@@ -22,6 +22,9 @@ bool largestDistance(ATile* tile1, ATile* tile2)
 
 void MovementManager::ShowPlayerUnitMovementRange(APlayerUnit* unit)
 {
+	ATile* firstTile = unit->GetCurrentTile();
+	firstTile->Distance = 0;
+	TouchedTiles.push_back(firstTile);
 	unit->GetCurrentTile()->Distance = 0;
 	ATile* currentTile;
 	std::vector<ATile*> tiles = Tiles;
@@ -43,10 +46,13 @@ void MovementManager::ShowPlayerUnitMovementRange(APlayerUnit* unit)
 					{
 						neighbor->Distance = tmpDistance;
 						neighbor->Parent = currentTile;
+						TouchedTiles.push_back(neighbor);
 					}
 				}
 			}
 		}
+		else
+			break;
 	}
 }
 
@@ -83,7 +89,10 @@ void MovementManager::FollowHeading()
 void MovementManager::FindOpponent(AUnit* unit)
 {
 	CurrentUnit = unit;
-	CurrentUnit->GetCurrentTile()->Distance = 0;
+	ATile* firstTile = CurrentUnit->GetCurrentTile();
+	firstTile->Distance = 0;
+	TouchedTiles.push_back(firstTile);
+
 	std::vector<ATile*> tiles = Tiles;
 	ATile* currentTile = nullptr;
 
@@ -92,7 +101,6 @@ void MovementManager::FindOpponent(AUnit* unit)
 		sort(tiles.begin(), tiles.end(), largestDistance);
 		currentTile = tiles.back();
 		tiles.pop_back();
-
 		currentTile->Visited = true;
 		for (ATile* neighbor : currentTile->GetAdjList())
 		{
@@ -103,6 +111,7 @@ void MovementManager::FindOpponent(AUnit* unit)
 				{
 					neighbor->Distance = tmpDistance;
 					neighbor->Parent = currentTile;
+					TouchedTiles.push_back(neighbor);
 				}
 				if (neighbor->PlayerOccupied)
 					break;
@@ -122,14 +131,17 @@ void MovementManager::FinishMoving()
 	ResetTiles();
 	Path = std::vector<ATile*>();
 	// Remove this later...
-	CurrentUnit->Active = false;
 	CurrentUnit = nullptr;
 }
 
 void MovementManager::ResetTiles()
 {
-	for (ATile* tile : Tiles)
-		tile->Reset();
+	while (!TouchedTiles.empty())
+	{
+		ATile* currentTile = TouchedTiles.back();
+		currentTile->Reset();
+		TouchedTiles.pop_back();
+	}
 }
 
 void MovementManager::AddToPathFromTile(ATile* tile)
