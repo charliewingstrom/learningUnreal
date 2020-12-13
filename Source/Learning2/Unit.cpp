@@ -81,3 +81,8 @@ uint32_t AUnit::GetMovement()
 	return Movement;
 }
 
+uint32_t AUnit::GetAttackRange()
+{
+	return 2;
+}
+

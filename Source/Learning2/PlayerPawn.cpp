@@ -26,19 +26,21 @@ APlayerPawn::APlayerPawn()
 
 	Director = Cast<ACameraDirector>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraDirector::StaticClass()));
 	MyMovementManager = new MovementManager(Tiles, Director);
-
+	MyCombatManager = new CombatManager();
 	HUD = Cast<AInGameHUD>(UGameplayStatics::GetActorOfClass(GetWorld(), AInGameHUD::StaticClass()));
 }
 
 APlayerPawn::~APlayerPawn()
 {
 	delete MyMovementManager;
+	delete MyCombatManager;
 }
 // Called when the game starts or when spawned
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	bPlayerTurn = true;
+	MyCombatManager->StartCombat(PlayerUnits[0]);
 }
 
 void APlayerPawn::TraceForTile(const FVector& Start, const FVector& End)
@@ -72,6 +74,7 @@ void APlayerPawn::SelectActor(AActor* selectedActor)
 		{
 			ATile* currentTile = Cast<ATile>(selectedActor);
 			MyMovementManager->StartMoving(currentTile);
+			bSelectingAction = true;
 		}
 	}
 	else if (selectedActor->GetClass() == APlayerUnit::StaticClass())

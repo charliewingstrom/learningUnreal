@@ -42,6 +42,7 @@ public:
 	void SetPreviousTile();
 
 	uint32_t GetMovement();
+	uint32_t GetAttackRange();
 
 	bool Active = false;
 };

@@ -26,9 +26,10 @@ public:
 	bool PlayerOccupied = false;
 	bool EnemyOccupied = false;
 
-	// for dijsktras
+	// for dijsktras or BFS
 	ATile* Parent;
 	uint32_t Distance = MAX_DISTANCE;
+	uint32_t AttackDistance = 0;
 	bool Visited = false;
 	bool Selectable = false;
 

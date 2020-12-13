@@ -108,6 +108,7 @@ void ATile::Reset()
 {
 	VisualMesh->SetMaterial(0, DefaultMaterial);
 	Distance = MAX_DISTANCE;
+	AttackDistance = 0;
 	Visited = false;
 	Parent = nullptr;
 	Selectable = false;

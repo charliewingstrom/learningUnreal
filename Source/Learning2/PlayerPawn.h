@@ -7,6 +7,7 @@
 
 #include "CameraDirector.h"
 #include "MovementManager.h"
+#include "CombatManager.h"
 #include "ui/InGameHUD.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
@@ -38,7 +39,9 @@ public:
 	void UnitWait();
 private:
 	bool bUnitMoving = false;
+	bool bSelectingAction = false;
 	MovementManager* MyMovementManager;
+	CombatManager* MyCombatManager;
 	
 	bool bPlayerTurn = true;
 	void StartPlayerTurn();
