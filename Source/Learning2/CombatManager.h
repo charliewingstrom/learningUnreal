@@ -18,8 +18,13 @@ public:
 private:
 	
 	void FindUnitsInRange();
+	void CalculateAttack();
+	void Attack();
 
 	AUnit* CurrentUnit;
+	std::vector<AUnit*> UnitsInRange;
 	AUnit* DefendingUnit;
+
+	std::vector<ATile*> TouchedTiles;
 };
 

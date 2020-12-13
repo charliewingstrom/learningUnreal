@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
 #include "Tile.generated.h"
 
 #define MAX_DISTANCE 256
+
+class AUnit;
 
 UCLASS()
 class LEARNING2_API ATile : public AActor
@@ -20,6 +23,8 @@ public:
 	std::vector<ATile*> GetAdjList();
 	
 	void Highlight(bool On);
+	void SetCurrentUnit(AUnit* unit);
+	AUnit* GetCurrentUnit();
 	void SetSelected();
 	void Reset();
 
@@ -45,6 +50,7 @@ private:
 	UMaterial* HighlightMaterial;
 	UMaterial* SelectableMaterial;
 	
+	AUnit* CurrentUnit;
 	std::vector<ATile*> AdjList;
 
 	void FindAdjList();

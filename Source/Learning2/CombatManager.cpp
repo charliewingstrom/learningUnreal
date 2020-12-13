@@ -14,7 +14,16 @@ CombatManager::~CombatManager()
 void CombatManager::StartCombat(AUnit* attackingUnit)
 {
 	CurrentUnit = attackingUnit;
+	if (CurrentUnit != nullptr)
+	{
+		FindUnitsInRange();
+		if (!UnitsInRange.empty())
+			DefendingUnit = UnitsInRange[0];
+	}
+}
 
+void CombatManager::FindUnitsInRange()
+{
 	// need to find the units in attacking range
 	// queue
 	// add first to queue
@@ -29,9 +38,13 @@ void CombatManager::StartCombat(AUnit* attackingUnit)
 	{
 		currTile = queue.back();
 		queue.pop_back();
+		TouchedTiles.push_back(currTile);
 		if (currTile->AttackDistance <= CurrentUnit->GetAttackRange())
 		{
-			currTile->SetSelected();
+			AUnit* target = currTile->GetCurrentUnit();
+			if (currTile->EnemyOccupied && target != nullptr)
+				UnitsInRange.push_back(target);
+
 			for (ATile* neighbor : currTile->GetAdjList())
 			{
 				if (!neighbor->Visited)

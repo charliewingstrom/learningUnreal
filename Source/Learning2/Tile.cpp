@@ -41,18 +41,6 @@ void ATile::FindAdjList()
 	for (int i = 0; i < 4; i++)
 	{
 		FVector lineEnd = currentLocation + vectorArray[i];
-
-		/*DrawDebugLine(
-			GetWorld(),
-			currentLocation,
-			lineEnd,
-			FColor::Red,
-			true,
-			100.0f,
-			0,
-			5.0f
-		);*/
-
 		FHitResult hitResult;
 		if (
 			GetWorld()->LineTraceSingleByChannel(
@@ -66,13 +54,9 @@ void ATile::FindAdjList()
 		{
 			AActor* hitActor = hitResult.GetActor();
 			if (hitActor != nullptr)
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("Actor Hit %s"), *hitActor->GetName());
 				AdjList.push_back( Cast<ATile>(hitActor));
-			}
+			
 		}
-		//else
-			//UE_LOG(LogTemp, Warning, TEXT("Hit nothing"));
 	}
 }
 
@@ -102,6 +86,16 @@ void ATile::Highlight(bool On)
 		VisualMesh->SetMaterial(0, SelectableMaterial);
 	else
 		VisualMesh->SetMaterial(0, DefaultMaterial);
+}
+
+void ATile::SetCurrentUnit(AUnit* unit)
+{
+	CurrentUnit = unit;
+}
+
+AUnit* ATile::GetCurrentUnit()
+{
+	return CurrentUnit;
 }
 
 void ATile::Reset()

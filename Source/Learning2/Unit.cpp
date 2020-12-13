@@ -42,7 +42,11 @@ void AUnit::Tick(float DeltaTime)
 void AUnit::FindCurrentTile()
 {
 	if (CurrentTile != nullptr)
+	{
 		CurrentTile->PlayerOccupied = false;
+		CurrentTile->SetCurrentUnit(nullptr);
+	}
+		
 
 	FVector currentLocation = GetActorLocation();
 	FVector below = FVector(0.0f, 0.0f, -50.0f);
@@ -67,6 +71,7 @@ void AUnit::FindCurrentTile()
 			UE_LOG(LogTemp, Warning, TEXT("%s current tile is set to %s"), *this->GetName(), *hitActor->GetName());
 			CurrentTile = Cast<ATile>(hitActor);
 			CurrentTile->PlayerOccupied = true;
+			CurrentTile->SetCurrentUnit(this);
 		}
 	}
 }

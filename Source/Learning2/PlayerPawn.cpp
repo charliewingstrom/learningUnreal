@@ -19,11 +19,6 @@ APlayerPawn::APlayerPawn()
 	for (AActor* player : playerUnits)
 		PlayerUnits.push_back(Cast<APlayerUnit>(player));
 
-	/*TArray<AActor*> enemyUnits;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyUnit::StaticClass(), enemyUnits);
-	for (AActor* enemy : enemyUnits)
-		EnemyUnits.push_back(Cast<AEnemyUnit>(enemy));*/
-
 	Director = Cast<ACameraDirector>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraDirector::StaticClass()));
 	MyMovementManager = new MovementManager(Tiles, Director);
 	MyCombatManager = new CombatManager();
@@ -40,7 +35,6 @@ void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	bPlayerTurn = true;
-	MyCombatManager->StartCombat(PlayerUnits[0]);
 }
 
 void APlayerPawn::TraceForTile(const FVector& Start, const FVector& End)
