@@ -5,7 +5,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Unit.generated.h"
-
+#include <map>
+enum Stat 
+{
+	MaxHp,
+	CurrHp,
+	Str,
+	Def,
+	Dex,
+	Spd
+};
 UCLASS()
 class LEARNING2_API AUnit : public AActor
 {
@@ -29,6 +38,12 @@ protected:
 
 private:
 	uint32_t Movement = 5;
+	int MaxHp = 20;
+	int CurrHp = MaxHp;
+	int Str = 5;
+	int Def = 3;
+	int Dex = 5;
+	int Spd = 5;
 
 protected:
 	ATile* CurrentTile;
@@ -43,6 +58,8 @@ public:
 
 	uint32_t GetMovement();
 	uint32_t GetAttackRange();
+
+	int GetStats(Stat stat);
 
 	bool Active = false;
 };

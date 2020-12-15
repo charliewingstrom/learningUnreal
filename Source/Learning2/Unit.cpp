@@ -91,3 +91,9 @@ uint32_t AUnit::GetAttackRange()
 	return 2;
 }
 
+int AUnit::GetStats(Stat stat)
+{
+	//return stats[stat];
+	return 0;
+}
+
