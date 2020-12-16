@@ -18,7 +18,12 @@ void CombatManager::StartCombat(AUnit* attackingUnit)
 	{
 		FindUnitsInRange();
 		if (!UnitsInRange.empty())
+		{
 			DefendingUnit = UnitsInRange[0];
+			CalculateAttack();
+			// display attack forcast UI
+
+		}
 	}
 }
 
@@ -55,6 +60,45 @@ void CombatManager::FindUnitsInRange()
 				}
 
 			}
+		}
+	}
+}
+
+void CombatManager::CalculateAttack()
+{
+	Damage = std::max(0, CurrentUnit->Str - DefendingUnit->Def);
+
+	Hit = (CurrentUnit->Dex + 50) - DefendingUnit->Dex;
+
+	Crit = CurrentUnit->Luck;
+}
+
+void CombatManager::InitiateAttack()
+{
+	int hitChance = rand() % 100;
+	int critChance = rand() % 100;
+	// if hitChance is lower than Hit, continue, else miss
+	if (hitChance <= Hit)
+	{
+		if (critChance <= Crit)
+			DefendingUnit->CurrHp -= Damage * 3;
+		else
+			DefendingUnit->CurrHp -= Damage;
+	}
+	if (DefendingUnit->CurrHp <= 0)
+	{
+		DefendingUnit->Destroy();
+	}
+	if (bDefenderCanCounter)
+	{
+		hitChance = rand() % 100;
+		if (hitChance <= CounterHit)
+		{
+			critChance = rand() % 100;
+			if (critChance <= CounterCrit)
+				CurrentUnit->CurrHp -= Damage * 3;
+			else
+				CurrentUnit->CurrHp -= Damage;
 		}
 	}
 }
