@@ -40,6 +40,9 @@ private:
 	void SelectActor();
 	void UnitWait();
 
+	// combat
+	void StartCombat();
+
 	ACameraDirector* Director;
 	APlayerPawn* Player;
 };

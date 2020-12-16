@@ -64,6 +64,7 @@ void APlayerPawn::SelectActor(AActor* selectedActor)
 {
 	if (CurrentUnit != nullptr)
 	{
+		// Unit is selected and set to move to selected Tile
 		if (selectedActor->GetClass() == ATile::StaticClass() && Cast<ATile>(selectedActor)->Selectable)
 		{
 			ATile* currentTile = Cast<ATile>(selectedActor);
@@ -71,6 +72,7 @@ void APlayerPawn::SelectActor(AActor* selectedActor)
 			bSelectingAction = true;
 		}
 	}
+	// unit is being selected
 	else if (selectedActor->GetClass() == APlayerUnit::StaticClass())
 	{
 		APlayerUnit* HitUnit = Cast<APlayerUnit>(selectedActor);
@@ -169,6 +171,14 @@ void APlayerPawn::StartEnemyTurn()
 void APlayerPawn::EndEnemyTurn()
 {
 	HUD->ShowEnemyPhaseText();
+}
+
+void APlayerPawn::StartCombat()
+{
+	if (CurrentUnit != nullptr && bSelectingAction && !bUnitMoving)
+	{
+		MyCombatManager->StartCombat(CurrentUnit);
+	}
 }
 
 

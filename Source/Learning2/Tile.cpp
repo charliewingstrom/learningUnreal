@@ -26,6 +26,8 @@ ATile::ATile()
 		VisualMesh->SetMaterial(0, DefaultMaterial);
 		static ConstructorHelpers::FObjectFinder<UMaterial> selectableMaterial(TEXT("/Game/CustomMaterials/Tiles/SelectableTile.SelectableTile"));
 		SelectableMaterial = selectableMaterial.Object;
+		static ConstructorHelpers::FObjectFinder<UMaterial> attackableMaterial(TEXT("/Game/CustomMaterials/Tiles/AttackableTile.AttackableTile"));
+		AttackableMaterial = attackableMaterial.Object;
 		static ConstructorHelpers::FObjectFinder<UMaterial> highlightMaterial(TEXT("/Game/CustomMaterials/Tiles/HighlightTile.HighlightTile"));
 		HighlightMaterial = highlightMaterial.Object;
 	}
@@ -78,12 +80,20 @@ void ATile::SetSelected()
 	Selectable = true;
 }
 
+void ATile::SetAttackable()
+{
+	VisualMesh->SetMaterial(0, AttackableMaterial);
+	Attackable = true;
+}
+
 void ATile::Highlight(bool On)
 {
 	if (On)
 		VisualMesh->SetMaterial(0, HighlightMaterial);
 	else if (Selectable)
 		VisualMesh->SetMaterial(0, SelectableMaterial);
+	else if (Attackable)
+		VisualMesh->SetMaterial(0, AttackableMaterial);
 	else
 		VisualMesh->SetMaterial(0, DefaultMaterial);
 }
@@ -106,6 +116,7 @@ void ATile::Reset()
 	Visited = false;
 	Parent = nullptr;
 	Selectable = false;
+	Attackable = false;
 }
 
 

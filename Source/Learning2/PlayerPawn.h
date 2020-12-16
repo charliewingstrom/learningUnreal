@@ -37,6 +37,8 @@ public:
 	void TraceForTile(const FVector& Start, const FVector& End);
 	void SelectActor(AActor* selectedActor);
 	void UnitWait();
+
+	void StartCombat();
 private:
 	bool bUnitMoving = false;
 	bool bSelectingAction = false;
@@ -49,6 +51,7 @@ private:
 	void StartEnemyTurn();
 	void EndEnemyTurn();
 
+	
 	ACameraDirector* Director;
 	AInGameHUD* HUD;
 	ATile* CurrentTileFocus;

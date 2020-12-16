@@ -26,6 +26,7 @@ public:
 	void SetCurrentUnit(AUnit* unit);
 	AUnit* GetCurrentUnit();
 	void SetSelected();
+	void SetAttackable();
 	void Reset();
 
 	bool PlayerOccupied = false;
@@ -37,6 +38,7 @@ public:
 	uint32_t AttackDistance = 0;
 	bool Visited = false;
 	bool Selectable = false;
+	bool Attackable = false;
 
 	UPROPERTY(VisibleAnywhere)
 		UStaticMeshComponent* VisualMesh;
@@ -49,7 +51,8 @@ private:
 	UMaterial* DefaultMaterial;
 	UMaterial* HighlightMaterial;
 	UMaterial* SelectableMaterial;
-	
+	UMaterial* AttackableMaterial;
+
 	AUnit* CurrentUnit;
 	std::vector<ATile*> AdjList;
 

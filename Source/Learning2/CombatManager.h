@@ -18,9 +18,11 @@ public:
 private:
 	
 	void FindUnitsInRange();
+	std::vector<AUnit*> GetUnitsInRange(AUnit* unit);
 	// finds the damage done, chance to hit, and chance to crit of an attack
 	void CalculateAttack();
 	void InitiateAttack();
+	void Cleanup();
 
 	bool bDefenderCanCounter = false;
 	int Damage;

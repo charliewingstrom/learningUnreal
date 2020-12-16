@@ -14,6 +14,7 @@ CombatManager::~CombatManager()
 void CombatManager::StartCombat(AUnit* attackingUnit)
 {
 	CurrentUnit = attackingUnit;
+	UE_LOG(LogTemp, Warning, TEXT("Combat Started"));
 	if (CurrentUnit != nullptr)
 	{
 		FindUnitsInRange();
@@ -46,6 +47,7 @@ void CombatManager::FindUnitsInRange()
 		TouchedTiles.push_back(currTile);
 		if (currTile->AttackDistance <= CurrentUnit->GetAttackRange())
 		{
+			currTile->SetAttackable();
 			AUnit* target = currTile->GetCurrentUnit();
 			if (currTile->EnemyOccupied && target != nullptr)
 				UnitsInRange.push_back(target);
@@ -64,6 +66,14 @@ void CombatManager::FindUnitsInRange()
 	}
 }
 
+std::vector<AUnit*> CombatManager::GetUnitsInRange(AUnit* unit)
+{
+	std::vector<AUnit*> toReturn;
+	ATile* firstTile = unit->GetCurrentTile();
+
+	return std::vector<AUnit*>();
+}
+
 void CombatManager::CalculateAttack()
 {
 	Damage = std::max(0, CurrentUnit->Str - DefendingUnit->Def);
@@ -71,6 +81,9 @@ void CombatManager::CalculateAttack()
 	Hit = (CurrentUnit->Dex + 50) - DefendingUnit->Dex;
 
 	Crit = CurrentUnit->Luck;
+	
+	// need to check if bDefenderCanCounter
+
 }
 
 void CombatManager::InitiateAttack()
@@ -89,16 +102,39 @@ void CombatManager::InitiateAttack()
 	{
 		DefendingUnit->Destroy();
 	}
-	if (bDefenderCanCounter)
+	else if (bDefenderCanCounter)
 	{
 		hitChance = rand() % 100;
 		if (hitChance <= CounterHit)
 		{
 			critChance = rand() % 100;
 			if (critChance <= CounterCrit)
-				CurrentUnit->CurrHp -= Damage * 3;
+				CurrentUnit->CurrHp -= CounterDamage * 3;
 			else
-				CurrentUnit->CurrHp -= Damage;
+				CurrentUnit->CurrHp -= CounterDamage;
 		}
+	}
+	if (CurrentUnit->CurrHp <= 0)
+	{
+		CurrentUnit->Destroy();
+	}
+}
+
+void CombatManager::Cleanup()
+{
+	bDefenderCanCounter = false;
+	Damage = 0;
+	Hit = 0;
+	Crit = 0;
+	CounterDamage = 0;
+	CounterHit = 0;
+	CounterCrit = 0;
+	CurrentUnit = nullptr;
+	DefendingUnit = nullptr;
+	UnitsInRange.clear();
+	while (!TouchedTiles.empty())
+	{
+		TouchedTiles.back()->Reset();
+		TouchedTiles.pop_back();
 	}
 }
