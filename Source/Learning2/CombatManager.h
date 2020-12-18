@@ -17,8 +17,11 @@ public:
 	void StartCombat(AUnit* attackingUnit);
 private:
 	
-	void FindUnitsInRange();
-	std::vector<AUnit*> GetUnitsInRange(AUnit* unit);
+	// I am unhappy these are two seperate methods
+	// but I need to be able to find enemies and players 
+	// regardless of what the type of the current unit is (for example if I want to find healing range)
+	std::vector<AUnit*> FindEnemiesInRange(AUnit* unit);
+	std::vector<AUnit*> GetPlayersInRange(AUnit* unit);
 	// finds the damage done, chance to hit, and chance to crit of an attack
 	void CalculateAttack();
 	void InitiateAttack();

@@ -36,6 +36,7 @@ void AEnemyUnit::FindCurrentTile()
 			UE_LOG(LogTemp, Warning, TEXT("%s current tile is set to %s"), *this->GetName(), *hitActor->GetName());
 			CurrentTile = Cast<ATile>(hitActor);
 			CurrentTile->EnemyOccupied = true;
+			CurrentTile->SetCurrentUnit(this);
 		}
 	}
 }

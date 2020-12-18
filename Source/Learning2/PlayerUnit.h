@@ -9,6 +9,7 @@
 /**
  * 
  */
+class AEnemyUnit;
 UCLASS()
 class LEARNING2_API APlayerUnit : public AUnit
 {

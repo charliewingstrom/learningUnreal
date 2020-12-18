@@ -17,7 +17,7 @@ void CombatManager::StartCombat(AUnit* attackingUnit)
 	UE_LOG(LogTemp, Warning, TEXT("Combat Started"));
 	if (CurrentUnit != nullptr)
 	{
-		FindUnitsInRange();
+		UnitsInRange = FindEnemiesInRange(CurrentUnit);
 		if (!UnitsInRange.empty())
 		{
 			DefendingUnit = UnitsInRange[0];
@@ -28,15 +28,16 @@ void CombatManager::StartCombat(AUnit* attackingUnit)
 	}
 }
 
-void CombatManager::FindUnitsInRange()
+std::vector<AUnit*> CombatManager::FindEnemiesInRange(AUnit* unit)
 {
 	// need to find the units in attacking range
 	// queue
 	// add first to queue
 	// get neighbors, add them to queue
 	// loop
+	std::vector<AUnit*> toReturn;
 	std::vector<ATile*> queue;
-	ATile* firstTile = CurrentUnit->GetCurrentTile();
+	ATile* firstTile = unit->GetCurrentTile();
 	firstTile->Visited = true;
 	queue.push_back(firstTile);
 	ATile* currTile;
@@ -45,12 +46,12 @@ void CombatManager::FindUnitsInRange()
 		currTile = queue.back();
 		queue.pop_back();
 		TouchedTiles.push_back(currTile);
-		if (currTile->AttackDistance <= CurrentUnit->GetAttackRange())
+		if (currTile->AttackDistance <= unit->GetAttackRange())
 		{
 			currTile->SetAttackable();
 			AUnit* target = currTile->GetCurrentUnit();
 			if (currTile->EnemyOccupied && target != nullptr)
-				UnitsInRange.push_back(target);
+				toReturn.push_back(target);
 
 			for (ATile* neighbor : currTile->GetAdjList())
 			{
@@ -60,18 +61,53 @@ void CombatManager::FindUnitsInRange()
 					neighbor->AttackDistance = currTile->AttackDistance + 1;
 					queue.push_back(neighbor);
 				}
-
 			}
 		}
 	}
+	while (!TouchedTiles.empty())
+	{
+		TouchedTiles.back()->Reset();
+		TouchedTiles.pop_back();
+	}
+	return toReturn;
 }
 
-std::vector<AUnit*> CombatManager::GetUnitsInRange(AUnit* unit)
+std::vector<AUnit*> CombatManager::GetPlayersInRange(AUnit* unit)
 {
 	std::vector<AUnit*> toReturn;
+	std::vector<ATile*> queue;
 	ATile* firstTile = unit->GetCurrentTile();
+	firstTile->Visited = true;
+	queue.push_back(firstTile);
+	ATile* currTile;
+	while (!queue.empty())
+	{
+		currTile = queue.back();
+		queue.pop_back();
+		TouchedTiles.push_back(currTile);
+		if (currTile->AttackDistance <= unit->GetAttackRange())
+		{
+			AUnit* target = currTile->GetCurrentUnit();
+			if (currTile->PlayerOccupied && target != nullptr)
+				toReturn.push_back(target);
 
-	return std::vector<AUnit*>();
+			for (ATile* neighbor : currTile->GetAdjList())
+			{
+				if (!neighbor->Visited)
+				{
+					neighbor->Visited = true;
+					neighbor->AttackDistance = currTile->AttackDistance + 1;
+					queue.push_back(neighbor);
+				}
+			}
+		}
+	}
+	while (!TouchedTiles.empty())
+	{
+		TouchedTiles.back()->Reset();
+		TouchedTiles.pop_back();
+	}
+	return toReturn;
 }
 
 void CombatManager::CalculateAttack()
@@ -83,7 +119,20 @@ void CombatManager::CalculateAttack()
 	Crit = CurrentUnit->Luck;
 	
 	// need to check if bDefenderCanCounter
+	std::vector<AUnit*> playersInRange = GetPlayersInRange(DefendingUnit);
 
+	if (std::find(playersInRange.begin(), playersInRange.end(), CurrentUnit) != playersInRange.end())
+	{
+		bDefenderCanCounter = true;
+		UE_LOG(LogTemp, Warning, TEXT("defender can counter"));
+		CounterDamage = std::max(0, DefendingUnit->Str - CurrentUnit->Def);
+		CounterHit = (DefendingUnit->Dex + 50) - CurrentUnit->Dex;
+		CounterCrit = DefendingUnit->Luck;
+	}
+	else
+	{
+		bDefenderCanCounter = false;
+	}
 }
 
 void CombatManager::InitiateAttack()
