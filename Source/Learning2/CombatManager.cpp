@@ -137,36 +137,41 @@ void CombatManager::CalculateAttack()
 
 void CombatManager::InitiateAttack()
 {
-	int hitChance = rand() % 100;
-	int critChance = rand() % 100;
-	// if hitChance is lower than Hit, continue, else miss
-	if (hitChance <= Hit)
+	if (CurrentUnit != nullptr && DefendingUnit != nullptr)
 	{
-		if (critChance <= Crit)
-			DefendingUnit->CurrHp -= Damage * 3;
-		else
-			DefendingUnit->CurrHp -= Damage;
-	}
-	if (DefendingUnit->CurrHp <= 0)
-	{
-		DefendingUnit->Destroy();
-	}
-	else if (bDefenderCanCounter)
-	{
-		hitChance = rand() % 100;
-		if (hitChance <= CounterHit)
+		UE_LOG(LogTemp, Warning, TEXT("Attack Initiated"));
+		int hitChance = rand() % 100;
+		int critChance = rand() % 100;
+		// if hitChance is lower than Hit, continue, else miss
+		if (hitChance <= Hit)
 		{
-			critChance = rand() % 100;
-			if (critChance <= CounterCrit)
-				CurrentUnit->CurrHp -= CounterDamage * 3;
+			if (critChance <= Crit)
+				DefendingUnit->CurrHp -= Damage * 3;
 			else
-				CurrentUnit->CurrHp -= CounterDamage;
+				DefendingUnit->CurrHp -= Damage;
+		}
+		if (DefendingUnit->CurrHp <= 0)
+		{
+			DefendingUnit->Destroy();
+		}
+		else if (bDefenderCanCounter)
+		{
+			hitChance = rand() % 100;
+			if (hitChance <= CounterHit)
+			{
+				critChance = rand() % 100;
+				if (critChance <= CounterCrit)
+					CurrentUnit->CurrHp -= CounterDamage * 3;
+				else
+					CurrentUnit->CurrHp -= CounterDamage;
+			}
+		}
+		if (CurrentUnit->CurrHp <= 0)
+		{
+			CurrentUnit->Destroy();
 		}
 	}
-	if (CurrentUnit->CurrHp <= 0)
-	{
-		CurrentUnit->Destroy();
-	}
+	Cleanup();
 }
 
 void CombatManager::Cleanup()

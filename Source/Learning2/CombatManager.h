@@ -15,6 +15,7 @@ public:
 
 public:
 	void StartCombat(AUnit* attackingUnit);
+	void InitiateAttack();
 private:
 	
 	// I am unhappy these are two seperate methods
@@ -24,7 +25,6 @@ private:
 	std::vector<AUnit*> GetPlayersInRange(AUnit* unit);
 	// finds the damage done, chance to hit, and chance to crit of an attack
 	void CalculateAttack();
-	void InitiateAttack();
 	void Cleanup();
 
 	bool bDefenderCanCounter = false;

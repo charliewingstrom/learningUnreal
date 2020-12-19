@@ -42,6 +42,8 @@ public:
 private:
 	bool bUnitMoving = false;
 	bool bSelectingAction = false;
+	bool bSelectingTarget = false;
+
 	MovementManager* MyMovementManager;
 	CombatManager* MyCombatManager;
 	

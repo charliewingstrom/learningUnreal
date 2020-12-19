@@ -175,9 +175,17 @@ void APlayerPawn::EndEnemyTurn()
 
 void APlayerPawn::StartCombat()
 {
-	if (CurrentUnit != nullptr && bSelectingAction && !bUnitMoving)
+	if (bSelectingTarget)
+	{
+		MyCombatManager->InitiateAttack();
+		bSelectingAction = false;
+		bSelectingTarget = false;
+		UnitWait();
+	}
+	else if (CurrentUnit != nullptr && bSelectingAction && !bUnitMoving)
 	{
 		MyCombatManager->StartCombat(CurrentUnit);
+		bSelectingTarget = true;
 	}
 }
 
