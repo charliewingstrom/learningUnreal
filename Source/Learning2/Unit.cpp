@@ -81,6 +81,11 @@ ATile* AUnit::GetCurrentTile()
 	return CurrentTile;
 }
 
+ATile* AUnit::GetPreviousTile()
+{
+	return PreviousTile;
+}
+
 uint32_t AUnit::GetMovement()
 {
 	return Movement;
@@ -89,6 +94,12 @@ uint32_t AUnit::GetMovement()
 uint32_t AUnit::GetAttackRange()
 {
 	return 2;
+}
+
+void AUnit::FinishAction()
+{
+	PreviousTile = nullptr;
+	Active = false;
 }
 
 int AUnit::GetStats(Stat stat)

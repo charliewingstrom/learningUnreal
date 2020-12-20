@@ -46,6 +46,7 @@ void AMyPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("SelectActor", IE_Pressed, this, &AMyPlayerController::SelectActor);
 	InputComponent->BindAction("UnitWait", IE_Pressed, this, &AMyPlayerController::UnitWait);
+	InputComponent->BindAction("ResetUnit", IE_Pressed, this, &AMyPlayerController::ResetUnit);
 
 	InputComponent->BindAction("StartCombat", IE_Pressed, this, &AMyPlayerController::StartCombat);
 }
@@ -105,6 +106,11 @@ void AMyPlayerController::SelectActor()
 void AMyPlayerController::UnitWait()
 {
 	Player->UnitWait();
+}
+
+void AMyPlayerController::ResetUnit()
+{
+	Player->ResetCurrentUnit();
 }
 
 void AMyPlayerController::StartCombat()

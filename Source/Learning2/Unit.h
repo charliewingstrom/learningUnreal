@@ -48,10 +48,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void FindCurrentTile();
 	ATile* GetCurrentTile();
+	ATile* GetPreviousTile();
 	void SetPreviousTile();
 
 	uint32_t GetMovement();
 	uint32_t GetAttackRange();
+
+	void FinishAction();
 
 	int GetStats(Stat stat);
 

@@ -86,7 +86,7 @@ void APlayerPawn::UnitWait()
 {
 	if (CurrentUnit != nullptr)
 	{
-		CurrentUnit->Active = false;
+		CurrentUnit->FinishAction();
 		CurrentUnit = nullptr;
 		int ActiveUnits = 0;
 		for (APlayerUnit* unit : PlayerUnits)
@@ -186,6 +186,23 @@ void APlayerPawn::StartCombat()
 	{
 		MyCombatManager->StartCombat(CurrentUnit);
 		bSelectingTarget = true;
+	}
+}
+
+void APlayerPawn::ResetCurrentUnit()
+{
+	if (CurrentUnit != nullptr)
+	{
+		ATile* prev = CurrentUnit->GetPreviousTile();
+		if (prev != nullptr)
+		{
+			FVector prevLocation = prev->GetActorLocation();
+			CurrentUnit->SetActorLocation(FVector(prevLocation[0], prevLocation[1], prevLocation[2] + 10.0f));
+			CurrentUnit->FindCurrentTile();
+			CurrentUnit = nullptr;
+			bSelectingAction = false;
+			bSelectingTarget = false;
+		}
 	}
 }
 

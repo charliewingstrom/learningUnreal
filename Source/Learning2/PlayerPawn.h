@@ -39,6 +39,7 @@ public:
 	void UnitWait();
 
 	void StartCombat();
+	void ResetCurrentUnit();
 private:
 	bool bUnitMoving = false;
 	bool bSelectingAction = false;

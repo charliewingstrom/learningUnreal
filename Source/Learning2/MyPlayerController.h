@@ -39,7 +39,7 @@ private:
 	// general actions
 	void SelectActor();
 	void UnitWait();
-
+	void ResetUnit();
 	// combat
 	void StartCombat();
 

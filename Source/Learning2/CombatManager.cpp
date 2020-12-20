@@ -5,6 +5,8 @@
 
 CombatManager::CombatManager()
 {
+	CurrentUnit = nullptr;
+	DefendingUnit = nullptr;
 }
 
 CombatManager::~CombatManager()
