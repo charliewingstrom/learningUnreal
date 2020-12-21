@@ -86,7 +86,7 @@ void MovementManager::FollowHeading()
 	}
 }
 
-void MovementManager::FindOpponent(AUnit* unit)
+AUnit* MovementManager::FindOpponent(AUnit* unit)
 {
 	CurrentUnit = unit;
 	ATile* firstTile = CurrentUnit->GetCurrentTile();
@@ -121,6 +121,7 @@ void MovementManager::FindOpponent(AUnit* unit)
 			break;
 	}
 	StartMoving(currentTile->Parent);
+	return currentTile->GetCurrentUnit();
 }
 
 void MovementManager::FinishMoving()

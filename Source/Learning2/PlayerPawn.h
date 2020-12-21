@@ -45,6 +45,8 @@ private:
 	bool bSelectingAction = false;
 	bool bSelectingTarget = false;
 
+	bool bWaitingForAttack = false;
+
 	MovementManager* MyMovementManager;
 	CombatManager* MyCombatManager;
 	

@@ -106,7 +106,7 @@ void APlayerPawn::UnitWait()
 void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (!bPlayerTurn && !MyMovementManager->bUnitMoving)
+	if (!(bPlayerTurn || MyMovementManager->bUnitMoving || bWaitingForAttack))
 	{
 		// for each enemy unit, find the path to the closest player unit
 		// move as far as possible on that path
@@ -114,16 +114,26 @@ void APlayerPawn::Tick(float DeltaTime)
 		{
 			CurrentUnit = EnemyUnits.back();
 			EnemyUnits.pop_back();
-			MyMovementManager->FindOpponent(CurrentUnit);
+			AUnit* opponent = MyMovementManager->FindOpponent(CurrentUnit);
 
-			// remove this later...
-			CurrentUnit = nullptr;
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *opponent->GetName());
+			MyCombatManager->SetupAutoAttack(CurrentUnit, opponent);
+			bWaitingForAttack = true;
 		}
 		else
 		{
 			EndEnemyTurn();
 			StartPlayerTurn();
 		}
+	}
+	else if (!bPlayerTurn && !MyMovementManager->bUnitMoving && bWaitingForAttack)
+	{
+		// here the enemy will have finished moving but will have not attacked yet
+		MyCombatManager->AutoAttack();
+		
+		// should be finished once here
+		bWaitingForAttack = false;
+		CurrentUnit = nullptr;
 	}
 		
 	if (MyMovementManager->bUnitMoving)

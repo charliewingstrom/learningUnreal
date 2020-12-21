@@ -22,7 +22,7 @@ public:
 	void ShowPlayerUnitMovementRange(APlayerUnit* unit);
 	void StartMoving(ATile* tile);
 	void FollowHeading();
-	void FindOpponent(AUnit* unit);
+	AUnit* FindOpponent(AUnit* unit);
 
 	bool bUnitMoving = false;
 	AUnit* CurrentUnit;

@@ -74,7 +74,7 @@ std::vector<AUnit*> CombatManager::FindEnemiesInRange(AUnit* unit)
 	return toReturn;
 }
 
-std::vector<AUnit*> CombatManager::GetPlayersInRange(AUnit* unit)
+std::vector<AUnit*> CombatManager::FindPlayersInRange(AUnit* unit)
 {
 	std::vector<AUnit*> toReturn;
 	std::vector<ATile*> queue;
@@ -121,7 +121,7 @@ void CombatManager::CalculateAttack()
 	Crit = CurrentUnit->Luck;
 	
 	// need to check if bDefenderCanCounter
-	std::vector<AUnit*> playersInRange = GetPlayersInRange(DefendingUnit);
+	std::vector<AUnit*> playersInRange = FindPlayersInRange(DefendingUnit);
 
 	if (std::find(playersInRange.begin(), playersInRange.end(), CurrentUnit) != playersInRange.end())
 	{
@@ -174,6 +174,24 @@ void CombatManager::InitiateAttack()
 		}
 	}
 	Cleanup();
+}
+
+void CombatManager::SetupAutoAttack(AUnit* attackingUnit, AUnit* defendingUnit)
+{
+	CurrentUnit = attackingUnit;
+	DefendingUnit = defendingUnit;
+}
+
+void CombatManager::AutoAttack()
+{
+	if (CurrentUnit != nullptr && DefendingUnit != nullptr)
+	{
+		// check if Current Unit can attack Defending unit and vice versa
+
+		// calculate attack
+		// actually attack
+		// cleanup
+	}
 }
 
 void CombatManager::Cleanup()
