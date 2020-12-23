@@ -187,10 +187,22 @@ void CombatManager::AutoAttack()
 	if (CurrentUnit != nullptr && DefendingUnit != nullptr)
 	{
 		// check if Current Unit can attack Defending unit and vice versa
-
-		// calculate attack
-		// actually attack
-		// cleanup
+		std::vector<AUnit*> playersInRange = FindPlayersInRange(CurrentUnit);
+		if (std::find(playersInRange.begin(), playersInRange.end(), DefendingUnit) != playersInRange.end())
+		{
+			// Current Player can attack the defender
+			// calculate attack
+			CalculateAttack();
+			
+			// actually attack
+			InitiateAttack();
+		}
+		else
+		{
+			// current Player cannot attack defender
+			// return;
+		}
+			
 	}
 }
 
