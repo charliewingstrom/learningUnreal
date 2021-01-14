@@ -34,7 +34,7 @@ APlayerPawn::~APlayerPawn()
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	bPlayerTurn = true;
+	StartPlayerTurn();
 }
 
 void APlayerPawn::TraceForTile(const FVector& Start, const FVector& End)
